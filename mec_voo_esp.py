@@ -1,7 +1,7 @@
 # Trabalho de Manobras de Mec Voo Espcial
 
 import numpy as np
-from np import cos, sen
+from np import cos, sin
 
 
 #Estudo de manobra de mudança de plano
