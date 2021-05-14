@@ -89,6 +89,7 @@ V_par2 = V2[0]
 V_r2 = V2[1]
 
 #The speed of the spacecraft at the outbound crossing is
+
 v2 = sqrt(V_par2**2+V_r2**2) #km/s
 
 # Fim do calculo para o dark side
