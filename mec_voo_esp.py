@@ -104,3 +104,6 @@ print("e2 =", round(e2, 2))
 
 Rp2 = h2**2 / (mu_sol * (1 + e2))
 print("Perihelium 2 =", round(Rp2, 2), "km")
+
+a2 = Rp2 * (1 + e2) / (1 - e2)  # Semimajor axis after flyby
+print("Semimajor axis 2 =", round(a2, 2), "km")
