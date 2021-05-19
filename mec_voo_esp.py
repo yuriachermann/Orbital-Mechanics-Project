@@ -93,13 +93,13 @@ print("Momentum =", round(h2, 2), "km²/s")
 e2_cos_theta2 = (h2**2 / (mu_sol * R_venus)) - 1
 print("e * cos(theta) =", round(e2_cos_theta2, 4))
 
-e2_sin_theta2 = V_rad2 * h2 / mu_sol
+e2_sin_theta2 = - V_rad2 * h2 / mu_sol
 print("e * sin(theta) =", round(e2_sin_theta2, 4))
 
-theta2 = np.arctan((e2_sin_theta2 / e2_cos_theta2)) * 180 / np.pi
+theta2 = 180 + np.arctan((e2_sin_theta2 / e2_cos_theta2)) * 180 / np.pi
 print("theta 2 =", round(theta2, 7), "º")
 
-e2 = e2_cos_theta2 / np.cos(theta2)
+e2 = e2_cos_theta2 / np.cos(theta2 * np.pi / 180)
 print("e2 =", round(e2, 2))
 
 Rp2 = h2**2 / (mu_sol * (1 + e2))
