@@ -122,8 +122,8 @@ print("Semimajor axis 2 =", round(a2, 4), "ua")
 
 # Orbital elements 2:
 #
-# Semimajor axis = 0.7283
+# Semimajor axis = 0.7283 ua
 # Eccentricity = 0.1848
 # Inclination = 0º
 # Longitude of the ascending node = 0º
-# Argument of periapsis = 300º
+# Argument of periapsis = 138º
