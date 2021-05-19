@@ -2,36 +2,48 @@ from math import sqrt
 import numpy as np
 
 # Constants:
+
 mu_sol = 1.3271e11  # [km³/s²]
 mu_venus = 324900  # [km³/s²]
 R_terra = 149.6e6  # [km]
 R_venus = 108.2e6  # [km]
 r_venus = 6052  # [km]
 
-# non-Hohmann transfer (orbit 1)
+# non-Hohmann transfer (orbit 1):
 
 rad = 30 * np.pi / 180  # True anomaly at inbound [rad]
 
 e1 = (R_terra - R_venus) / (R_terra + R_venus * np.cos(rad))  # Transfer orbit eccentricity
-# print("e1 =", round(e1, 2))
+print("e1 =", round(e1, 4))
 
 h1 = np.sqrt(mu_sol * R_terra * (1 - e1))  # [km²/s]
-# print("h1 =", round(h1, 2), "km²/s")
+print("h1 =", round(h1, 2), "km²/s")
+
+a1 = 6.684e-9 * h1**2 / (mu_sol * (1 - e1**2))
+print("a1 =", round(a1, 4), "ua")
 
 V_trans1 = h1 / R_venus  # Transverse velocity [km/s]
-# print("transverse vel =", round(V_trans, 2), "km/s")
+print("transverse vel =", round(V_trans1, 2), "km/s")
 
 V_rad1 = (mu_sol / h1) * e1 * np.sin(-rad)  # Radial velocity [km/s]
-# print("radial vel =", round(V_rad, 2), "km/s")
+print("radial vel =", round(V_rad1, 2), "km/s")
 
 gamma1 = (np.arctan(V_rad1 / V_trans1)) * 180 / np.pi  # Flight path angle [º]
-# print("gamma =", round(gamma, 2), "º")
+print("gamma =", round(gamma1, 2), "º")
 
 V1_mod = np.sqrt(V_rad1**2 + V_trans1**2)  # Vehicle speed at the inbound crossing [km/s]
-# print("Inbound speed =", round(V1_mod, 2), "km/s")
+print("Inbound speed =", round(V1_mod, 2), "km/s")
+
+# Orbital elements 1:
+#
+# Semimajor axis = 0.8545 ua
+# Eccentricity = 0.1702
+# Inclination = 0º
+# Ascending node longitude = 0º
+# Argument of periapsis = 0º
 
 
-# Fase 2 da missao (Flyby para venus):
+# Flyby through Venus (orbit 2):
 
 V1 = np.array([V_trans1, V_rad1])  # Vehicle velocity at the inbound crossing [km/s]
 print("Inbound velocity = [", round(V1[0], 4), ",", round(V1[1], 4), "] km/s")
@@ -100,10 +112,18 @@ theta2 = 180 + np.arctan((e2_sin_theta2 / e2_cos_theta2)) * 180 / np.pi
 print("theta 2 =", round(theta2, 7), "º")
 
 e2 = e2_cos_theta2 / np.cos(theta2 * np.pi / 180)
-print("e2 =", round(e2, 2))
+print("e2 =", round(e2, 4))
 
 Rp2 = h2**2 / (mu_sol * (1 + e2))
 print("Perihelium 2 =", round(Rp2, 2), "km")
 
-a2 = Rp2 * (1 + e2) / (1 - e2)  # Semimajor axis after flyby
-print("Semimajor axis 2 =", round(a2, 2), "km")
+a2 = 6.684e-9 * Rp2 * (1 + e2) / (1 - e2)  # Semimajor axis after flyby
+print("Semimajor axis 2 =", round(a2, 4), "ua")
+
+# Orbital elements 2:
+#
+# Semimajor axis = 0.7283
+# Eccentricity = 0.1848
+# Inclination = 0º
+# Longitude of the ascending node = 0º
+# Argument of periapsis = 300º
