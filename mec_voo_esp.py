@@ -1,95 +1,93 @@
-# Code developed by Luiz Junior in 05/12/2021 at 11:18
-
 from math import sqrt
 import numpy as np
-import sympy as s
 
 # Constants:
-mu_sol = (1.3271)*(10**11) # Em km^3/s^2
+mu_sol = 1.3271e11  # [km³/s²]
+mu_venus = 324900  # [km³/s²]
+R_terra = 149.6e6  # [km]
+R_venus = 108.2e6  # [km]
+r_venus = 6052  # [km]
 
-mu_venus = 324900 # Em km^3/s^2
+# non-Hohmann transfer (orbit 1)
 
-R_terra = (149.6)*(10**6) # Em km
+rad = 30 * np.pi / 180  # True anomaly at inbound [rad]
 
-R_venus = (108.2)*(10**6) # Em km
+e1 = (R_terra - R_venus) / (R_terra + R_venus * np.cos(rad))  # Transfer orbit eccentricity
+# print("e1 =", round(e1, 2))
 
-r_venus = 6052 # Em km
+h1 = np.sqrt(mu_sol * R_terra * (1 - e1))  # [km²/s]
+# print("h1 =", round(h1, 2), "km²/s")
 
-# Fase 1 da missao:
+V_trans1 = h1 / R_venus  # Transverse velocity [km/s]
+# print("transverse vel =", round(V_trans, 2), "km/s")
 
-degress = 30*np.pi/180
+V_rad1 = (mu_sol / h1) * e1 * np.sin(-rad)  # Radial velocity [km/s]
+# print("radial vel =", round(V_rad, 2), "km/s")
 
-e1 = (R_terra-R_venus)/(R_terra+R_venus*np.cos(degress))
+gamma1 = (np.arctan(V_rad1 / V_trans1)) * 180 / np.pi  # Flight path angle [º]
+# print("gamma =", round(gamma, 2), "º")
 
-h1 = np.sqrt(mu_sol*R_terra*(1-e1)) # Em km^2/s
+V1_mod = np.sqrt(V_rad1**2 + V_trans1**2)  # Vehicle speed at the inbound crossing [km/s]
+# print("Inbound speed =", round(V1_mod, 2), "km/s")
 
-V_par = h1/R_venus # Em km/s
-
-V_r = (mu_sol/h1)*e1*np.sin(degress) # Em km/s
-
-#print(V_par)
-#print(V_r)
-
-gamma = (np.arctan(V_r/V_par))*180/np.pi 
-
-#print(gamma)
-
-v1v = np.sqrt(V_r**2+V_par**2) # Em km/s
-
-#print(v1v)
 
 # Fase 2 da missao (Flyby para venus):
 
-V1 = np.array((V_par,V_r))
+V1 = np.array([V_trans1, V_rad1])  # Vehicle velocity at the inbound crossing [km/s]
+# print("Inbound velocity = [", round(V1[0], 4), ",", round(V1[1], 4), "] km/s")
 
-# The velocity of Venus in its presumed circular orbit around the sun is
+V_venus_mod = np.sqrt(mu_sol / R_venus)  # Venus speed in circular orbit [km/s]
+# print("Venus speed =", round(V_venus_mod, 2), "km/s")
 
-V_venus = np.sqrt(mu_sol/R_venus)
+V_venus = np.array([V_venus_mod, 0])  # Venus velocity in circular orbit [km/s]
+# print("Venus velocity = [", round(V_venus[0], 4), ",", round(V_venus[1], 4), "] km/s")
 
-# print(V_venus) # ok
+V_inf = V1 - V_venus  # Hyperbolic excess vehicle velocity [km/s]
+# print("Hyperbolic velocity 1 = [", round(V_inf[0], 4), ",", round(V_inf[1], 4), "] km/s")
 
-V = np.array((V_venus,0))
+V_inf_mod = np.sqrt(V_inf[0]**2 + V_inf[1]**2)  # Hyperbolic excess vehicle speed [km/s]
+# print("Hyperbolic speed =", round(V_inf_mod, 2), "km/s")
 
-V_inf = V1-V
+rp = r_venus + 300  # Periapse radius [km]
+# print("Periapse radius =", round(rp, 2), "km")
 
-# disto temos que
+h_v = rp * np.sqrt(V_inf_mod**2 + (2 * mu_venus / rp))  # Hyperbola angular momentum [km²/s]
+# print("Hyperbola angular momentum =", round(h_v, 2), "km²/s")
 
-v_inf = np.sqrt(V_inf[0]*V_inf[0]+V_inf[1]*V_inf[1])
+e_v = 1 + (rp * V_inf_mod**2) / mu_venus  # Hyperbola eccentricity
+# print("Hyperbola eccentricity =", round(e_v, 2))
 
-#print(v_inf) ok
+deltinha = 2 * np.arcsin(1 / e_v) * 180 / np.pi  # Asymptote turn angle [º]
+# print("Asymptote turn angle =", round(deltinha, 2), "º")
 
-rp = r_venus+300
+theta_inf = np.arccos(-1 / e_v) * 180 / np.pi  # Asymptote true anomaly [º]
+# print("Asymptote true anomaly =", round(theta_inf, 2), "º")
 
-h_v = rp*np.sqrt(v_inf**2+(2*mu_venus/rp))
+delta = rp * np.sqrt((e_v + 1) / (e_v - 1))  # Aiming radius [km]
+# print("Aiming radius =", round(delta, 2), "km")
 
-e_v = 1 + (rp*(v_inf**2))/mu_venus
+phi = np.arctan(V_inf[1] / V_inf[0]) * 180 / np.pi  # Inbound velocity angle [º]
+# print("Inbound velocity angle =", round(phi, 2), "º")
 
-deltinha = 2*s.asin(1/e_v)*180/np.pi
+phi2 = (phi + deltinha) * np.pi / 180  # Outbound velocity angle [º]
+# print("Outbound velocity angle =", round(phi2, 2), "º")
 
-theta_inf = s.acos(-1/e_v)*180/np.pi
+V_inf2 = V_inf * np.array([np.cos(phi2), np.sin(phi2)])  # Hyperbolic excess vehicle velocity [km/s]
+# print("Hyperbolic velocity 2 = [", round(V_inf2[0], 4), ",", round(V_inf2[1], 4), "] km/s")
 
-delta = rp*np.sqrt((e_v+1)/(e_v-1)) # Em km
+V2 = V_venus + V_inf2  # Vehicle heliocentric velocity at outbound [km/s]
+# print("Heliocentric velocity = [", round(V2[0], 4), ",", round(V2[1], 4), "] km/s")
 
-# angle between v_inf e V
+V_trans2 = V2[0]  # Transverse velocity [km/s]
+# print("Transverse velocity =", round(V_trans2, 2), "km/s")
 
-fi = s.atan(V_inf[1]/V_inf[0])*180/np.pi
+V_rad2 = V2[1]  # Radial velocity [km/s]
+# print("Radial velocity =", round(V_rad2, 2), "km/s")
 
-#print(fi)
+v2 = sqrt(V_trans2**2 + V_rad2**2)  # Outbound speed [km/s]
+# print("Outbound speed =", round(v2, 2), "km/s")
 
-fi2_deg = (fi + deltinha)
+h2 = r_venus * V_rad2
+# print("Outbound speed =", round(v2, 2), "km/s")
 
-fi2 = (fi + deltinha)*np.pi/180
-
-V_inf2 = v_inf*np.array((s.cos(fi2),s.sin(fi2)))
-
-V2 = V + V_inf2
-
-V_par2 = V2[0]
-
-V_r2 = V2[1]
-
-#The speed of the spacecraft at the outbound crossing is
-
-v2 = sqrt(V_par2**2+V_r2**2) #km/s
-
-# Fim do calculo para o dark side
+# r_perihelion
